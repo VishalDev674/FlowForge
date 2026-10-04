@@ -5,8 +5,10 @@ import { ReactFlowProvider } from '@xyflow/react';
 import WorkflowEditor from '@/components/editor/WorkflowEditor';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import api from '@/lib/api';
+import { useRequireRole } from '@/lib/auth-guard';
 
 export default function EditorPage() {
+  const { allowed } = useRequireRole(['admin', 'reviewer']);
   const { id } = useParams<{ id: string }>();
   const [workflow, setWorkflow] = useState<{
     id: string; name: string; status: string;
@@ -17,11 +19,12 @@ export default function EditorPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!allowed) return;
     api.workflows.get(id)
       .then(setWorkflow)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, allowed]);
 
   if (loading) {
     return (

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChevronLeft, Zap, Activity, CheckCircle, AlertTriangle, Clock, Loader2, ExternalLink, GitBranch } from 'lucide-react';
 import api from '@/lib/api';
+import { useRequireRole } from '@/lib/auth-guard';
 
 const STATUS_STYLES: Record<string, { color: string; bg: string }> = {
   completed: { color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
@@ -14,6 +15,7 @@ const STATUS_STYLES: Record<string, { color: string; bg: string }> = {
 };
 
 export default function WorkflowRunsPage() {
+  const { allowed } = useRequireRole(['admin', 'reviewer']);
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [workflow, setWorkflow] = useState<{ name: string } | null>(null);
@@ -25,6 +27,7 @@ export default function WorkflowRunsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!allowed) return;
     Promise.all([
       api.workflows.get(id),
       api.workflows.runs(id),

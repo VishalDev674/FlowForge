@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Zap, Activity, CheckCircle, AlertTriangle, Clock, Loader2, ExternalLink } from 'lucide-react';
 import api from '@/lib/api';
+import { useRequireRole } from '@/lib/auth-guard';
 
 const STATUS_STYLES: Record<string, { color: string; bg: string }> = {
   completed: { color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
@@ -13,6 +14,7 @@ const STATUS_STYLES: Record<string, { color: string; bg: string }> = {
 };
 
 export default function RunsPage() {
+  const { allowed } = useRequireRole(['admin', 'reviewer']);
   const router = useRouter();
   const [runs, setRuns] = useState<{
     id: string; workflow_id: string; status: string; trigger_type: string;
@@ -22,8 +24,16 @@ export default function RunsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.runs.list().then(setRuns).finally(() => setLoading(false));
-  }, []);
+    if (allowed) api.runs.list().then(setRuns).finally(() => setLoading(false));
+  }, [allowed]);
+
+  if (!allowed) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0b0f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Loader2 size={28} color="#6366f1" style={{ animation: 'spin 1s linear infinite' }} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0b0f', fontFamily: 'Inter, sans-serif' }}>

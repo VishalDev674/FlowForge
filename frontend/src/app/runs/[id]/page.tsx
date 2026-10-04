@@ -6,6 +6,7 @@ import {
   Activity, RefreshCw, ChevronDown, ChevronUp
 } from 'lucide-react';
 import api, { WS_BASE } from '@/lib/api';
+import { useRequireRole } from '@/lib/auth-guard';
 
 interface NodeRun {
   id: string;
@@ -172,6 +173,7 @@ function NodeRunCard({ nr, onRetry }: { nr: NodeRun; onRetry: (id: string) => vo
 }
 
 export default function RunDetailPage() {
+  const { allowed } = useRequireRole(['admin', 'reviewer']);
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [run, setRun] = useState<RunData | null>(null);
@@ -185,6 +187,7 @@ export default function RunDetailPage() {
   }, [id]);
 
   useEffect(() => {
+    if (!allowed) return;
     loadRun();
 
     // Connect WebSocket for live updates
