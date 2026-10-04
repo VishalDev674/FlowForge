@@ -12,8 +12,8 @@ interface User {
 interface AuthState {
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ id: string; name: string; email: string; role: string; access_token: string }>;
+  register: (name: string, email: string, password: string, role?: string) => Promise<{ id: string; name: string; email: string; role: string; access_token: string }>;
   logout: () => void;
 }
 
@@ -25,12 +25,16 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         const data = await api.auth.login({ email, password });
         localStorage.setItem('ff_token', data.access_token);
-        set({ user: { id: data.user_id, name: data.name, email: data.email, role: data.role }, token: data.access_token });
+        const userObj = { id: data.user_id, name: data.name, email: data.email, role: data.role };
+        set({ user: userObj, token: data.access_token });
+        return { ...userObj, access_token: data.access_token };
       },
-      register: async (name, email, password) => {
-        const data = await api.auth.register({ name, email, password });
+      register: async (name, email, password, role = 'admin') => {
+        const data = await api.auth.register({ name, email, password, role });
         localStorage.setItem('ff_token', data.access_token);
-        set({ user: { id: data.user_id, name: data.name, email: data.email, role: data.role }, token: data.access_token });
+        const userObj = { id: data.user_id, name: data.name, email: data.email, role: data.role };
+        set({ user: userObj, token: data.access_token });
+        return { ...userObj, access_token: data.access_token };
       },
       logout: () => {
         localStorage.removeItem('ff_token');

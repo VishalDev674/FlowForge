@@ -1,8 +1,9 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Zap, Users, CheckCircle, AlertTriangle, Clock, ExternalLink, Loader2 } from 'lucide-react';
+import { ChevronLeft, Zap, Users, CheckCircle, AlertTriangle, Clock, ExternalLink, Loader2, LogIn, LogOut, Shield, User as UserIcon } from 'lucide-react';
 import api from '@/lib/api';
+import { useAuthStore } from '@/lib/store';
 
 const APP_STATUS: Record<string, { color: string; bg: string; label: string }> = {
   received: { color: '#3b82f6', bg: 'rgba(59,130,246,0.1)', label: 'Received' },
@@ -15,6 +16,7 @@ const APP_STATUS: Record<string, { color: string; bg: string; label: string }> =
 
 export default function ApplicationsPage() {
   const router = useRouter();
+  const { user, logout } = useAuthStore();
   const [apps, setApps] = useState<{
     id: string; applicant_name: string; email: string; phone?: string;
     program?: string; percentage?: string; status: string;
@@ -36,13 +38,58 @@ export default function ApplicationsPage() {
         </button>
         <Zap size={16} color="#6366f1" />
         <span style={{ fontSize: 14, fontWeight: 600, color: '#e8eaf0' }}>Applications</span>
-        <div style={{ marginLeft: 'auto' }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
             onClick={() => router.push('/apply')}
             style={{ padding: '7px 14px', borderRadius: 8, background: 'linear-gradient(135deg,#6366f1,#818cf8)', border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
           >
             + Submit Application
           </button>
+          {user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 8, borderLeft: '1px solid #1f2335' }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '4px 10px', borderRadius: 8,
+                background: user.role === 'admin' ? 'rgba(99,102,241,0.12)' : 'rgba(16,185,129,0.12)',
+                border: `1px solid ${user.role === 'admin' ? 'rgba(99,102,241,0.3)' : 'rgba(16,185,129,0.3)'}`,
+              }}>
+                {user.role === 'admin' ? <Shield size={12} color="#818cf8" /> : <UserIcon size={12} color="#10b981" />}
+                <span style={{ fontSize: 11, fontWeight: 600, color: user.role === 'admin' ? '#c7d2fe' : '#a7f3d0' }}>
+                  {user.name}
+                </span>
+                <span style={{
+                  fontSize: 9, textTransform: 'uppercase', fontWeight: 700,
+                  padding: '1px 4px', borderRadius: 4,
+                  background: user.role === 'admin' ? '#6366f1' : '#10b981', color: '#fff'
+                }}>
+                  {user.role}
+                </span>
+              </div>
+              <button
+                onClick={() => { logout(); router.push('/login'); }}
+                title="Sign Out"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 28, height: 28, borderRadius: 6,
+                  background: 'transparent', border: '1px solid #1f2335',
+                  color: '#8b91a8', cursor: 'pointer'
+                }}
+              >
+                <LogOut size={13} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => router.push('/login?returnUrl=/applications')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid #262b40',
+                borderRadius: 8, color: '#e2e8f0', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              <LogIn size={13} /> Sign In
+            </button>
+          )}
         </div>
       </div>
 

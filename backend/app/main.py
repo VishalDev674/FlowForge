@@ -10,10 +10,45 @@ from app.engine import manager
 from app import models  # ensure all models are registered
 
 
+def seed_default_users():
+    """Auto-seed default admin and demo user for instant login."""
+    from app.database import SessionLocal
+    from app.auth import hash_password
+    db = SessionLocal()
+    try:
+        admin_user = db.query(models.User).filter(models.User.email == "admin@flowforge.dev").first()
+        if not admin_user:
+            admin_user = models.User(
+                id=str(uuid.uuid4()),
+                name="Admin User",
+                email="admin@flowforge.dev",
+                password_hash=hash_password("admin123"),
+                role=models.UserRole.admin,
+            )
+            db.add(admin_user)
+
+        portal_user = db.query(models.User).filter(models.User.email == "user@flowforge.dev").first()
+        if not portal_user:
+            portal_user = models.User(
+                id=str(uuid.uuid4()),
+                name="Portal Applicant",
+                email="user@flowforge.dev",
+                password_hash=hash_password("user123"),
+                role=models.UserRole.applicant,
+            )
+            db.add(portal_user)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+    finally:
+        db.close()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create tables on startup
     Base.metadata.create_all(bind=engine)
+    seed_default_users()
     yield
 
 
