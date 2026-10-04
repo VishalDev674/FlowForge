@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import {
   Zap, FileText, CheckCircle, AlertTriangle, Loader2, ChevronLeft,
   User, Mail, Phone, BookOpen, BarChart2, Upload,
-  LogIn, LogOut, Shield, UserCheck
+  LogIn, LogOut, Shield, UserCheck, Terminal, Cpu, CheckCircle2
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuthStore } from '@/lib/store';
@@ -27,11 +27,11 @@ export default function ApplyPage() {
     applicant_name: user?.name || '',
     email: user?.email || '',
     phone: '',
-    program: '',
+    program: 'Computer Science & AI',
     percentage: '',
-    marksheet: false,
-    identity_proof: false,
-    photo: false,
+    marksheet: true,
+    identity_proof: true,
+    photo: true,
   });
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ success: boolean; id?: string; error?: string } | null>(null);
@@ -40,9 +40,9 @@ export default function ApplyPage() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.applicant_name.trim()) e.applicant_name = 'Name is required';
-    if (!form.email.trim() || !form.email.includes('@')) e.email = 'Valid email required';
+    if (!form.email.trim() || !form.email.includes('@')) e.email = 'Valid email is required';
     if (!form.program.trim()) e.program = 'Program is required';
-    if (!form.percentage.trim()) e.percentage = 'Percentage/Score is required';
+    if (!form.percentage.trim()) e.percentage = 'Percentage is required';
     return e;
   };
 
@@ -77,15 +77,15 @@ export default function ApplyPage() {
   const loadDemo = (complete: boolean) => {
     if (complete) {
       setForm({
-        applicant_name: 'Aarav Kumar', email: 'aarav@example.com',
-        phone: '+91 98765 43210', program: 'Computer Science',
-        percentage: '84.2', marksheet: true, identity_proof: true, photo: true,
+        applicant_name: 'Alex Chen', email: 'alex.chen@flowforge.dev',
+        phone: '+1 555-0192', program: 'Computer Science & AI',
+        percentage: '88.5', marksheet: true, identity_proof: true, photo: true,
       });
     } else {
       setForm({
-        applicant_name: 'Priya Sharma', email: 'priya@example.com',
-        phone: '+91 98765 00000', program: 'Engineering',
-        percentage: '76.5', marksheet: true, identity_proof: true, photo: false,
+        applicant_name: 'Elena Rostova', email: 'elena.rostova@flowforge.dev',
+        phone: '+1 555-0144', program: 'Autonomous Robotics',
+        percentage: '73.2', marksheet: true, identity_proof: true, photo: false,
       });
     }
     setErrors({});
@@ -94,65 +94,62 @@ export default function ApplyPage() {
 
   const Field = ({ id, label, icon: Icon, error, children }: { id: string; label: string; icon: React.ElementType; error?: string; children: React.ReactNode }) => (
     <div style={{ marginBottom: 18 }}>
-      <label htmlFor={id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#8b91a8', marginBottom: 7, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        <Icon size={11} /> {label}
+      <label htmlFor={id} style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        fontSize: 12, fontWeight: 600, color: '#7d8da0', marginBottom: 6,
+      }}>
+        <Icon size={12} color="#00ff66" /> {label}
       </label>
       {children}
-      {error && <div style={{ fontSize: 11, color: '#ef4444', marginTop: 4 }}>{error}</div>}
+      {error && <div style={{ fontSize: 11, color: '#ff3b5c', marginTop: 4 }}>{error}</div>}
     </div>
   );
 
-  const inputStyle = (hasError?: boolean) => ({
-    width: '100%', background: '#0f1117',
-    border: `1px solid ${hasError ? '#ef4444' : '#1f2335'}`,
-    borderRadius: 8, padding: '10px 12px',
-    color: '#e8eaf0', fontSize: 13, outline: 'none',
-  });
-
   if (result?.success) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0a0b0f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif' }}>
-        <div style={{
-          background: '#0f1117', border: '1px solid rgba(16,185,129,0.3)',
-          borderRadius: 16, padding: 40, maxWidth: 440, width: '100%', textAlign: 'center',
-          animation: 'fadeIn 0.4s ease',
+      <div style={{ minHeight: '100vh', background: '#050608', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 2, padding: 20 }}>
+        <div className="fade-in" style={{
+          background: '#0B0F15', border: '1px solid #151D2B', borderRadius: 12,
+          padding: 40, maxWidth: 460, width: '100%', textAlign: 'center',
+          boxShadow: '0 24px 64px -16px rgba(0,0,0,0.6)',
         }}>
           <div style={{
-            width: 64, height: 64, borderRadius: '50%',
-            background: 'rgba(16,185,129,0.15)',
+            width: 56, height: 56, borderRadius: 12,
+            background: 'rgba(0,255,102,0.08)', border: '1px solid rgba(0,255,102,0.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 20px',
-            boxShadow: '0 0 24px rgba(16,185,129,0.2)',
           }}>
-            <CheckCircle size={32} color="#10b981" />
+            <CheckCircle size={28} color="#00ff66" />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#e8eaf0', marginBottom: 10 }}>
-            Application Submitted!
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#f0f4f8', marginBottom: 8 }}>
+            Application Submitted
           </h1>
-          <p style={{ fontSize: 14, color: '#8b91a8', marginBottom: 6, lineHeight: 1.6 }}>
-            Your application has been received and is now being processed by FlowForge.
+          <p style={{ fontSize: 13, color: '#7d8da0', marginBottom: 24, lineHeight: 1.6 }}>
+            Your application has been received and the automated review pipeline has been initiated.
           </p>
           <div style={{
-            background: '#13151d', border: '1px solid #1f2335',
-            borderRadius: 8, padding: '12px 16px', marginBottom: 24, textAlign: 'left',
+            background: '#080B10', border: '1px solid #151D2B',
+            borderRadius: 8, padding: '14px 18px', marginBottom: 28, textAlign: 'left',
           }}>
-            <div style={{ fontSize: 11, color: '#4a5068', marginBottom: 4 }}>Application ID</div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#6366f1', fontFamily: 'monospace' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#4a5a70', marginBottom: 4 }}>
+              Application ID
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 700, color: '#00ff66' }}>
               {result.id}
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button
-              onClick={() => { setResult(null); setForm({ applicant_name: '', email: '', phone: '', program: '', percentage: '', marksheet: false, identity_proof: false, photo: false }); }}
-              style={{ flex: 1, padding: '10px', borderRadius: 8, background: '#13151d', border: '1px solid #1f2335', color: '#8b91a8', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              onClick={() => { setResult(null); setForm({ applicant_name: '', email: '', phone: '', program: 'Computer Science & AI', percentage: '', marksheet: true, identity_proof: true, photo: true }); }}
+              className="cyber-btn cyber-btn-secondary" style={{ flex: 1 }}
             >
               Submit Another
             </button>
             <button
               onClick={() => router.push('/dashboard')}
-              style={{ flex: 1, padding: '10px', borderRadius: 8, background: 'linear-gradient(135deg,#6366f1,#818cf8)', border: 'none', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+              className="cyber-btn cyber-btn-primary" style={{ flex: 1.2 }}
             >
-              View Dashboard
+              Go to Dashboard →
             </button>
           </div>
         </div>
@@ -161,209 +158,184 @@ export default function ApplyPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0b0f', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#050608', position: 'relative', zIndex: 2 }}>
       {/* Header */}
       <div style={{
-        background: '#0f1117', borderBottom: '1px solid #1f2335',
-        padding: '14px 24px', display: 'flex', alignItems: 'center', gap: 16,
+        background: 'rgba(8,11,16,0.88)', backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid #151D2B',
+        padding: '0 28px', display: 'flex', alignItems: 'center', gap: 16,
+        height: 56, position: 'sticky', top: 0, zIndex: 100,
       }}>
-        <button
-          onClick={() => router.push('/dashboard')}
-          style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 10px', borderRadius: 7, background: 'transparent', border: '1px solid #1f2335', color: '#8b91a8', fontSize: 12, cursor: 'pointer' }}
-        >
-          <ChevronLeft size={13} /> Dashboard
+        <button onClick={() => router.push('/dashboard')}
+          className="cyber-btn cyber-btn-ghost" style={{ padding: '6px 12px', fontSize: 12 }}>
+          <ChevronLeft size={14} /> Dashboard
         </button>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Zap size={16} color="#6366f1" />
-          <span style={{ fontSize: 15, fontWeight: 700, color: '#e8eaf0' }}>Submit Application</span>
+          <Zap size={14} color="#00ff66" />
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#f0f4f8' }}>
+            Application Form
+          </span>
         </div>
+
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                padding: '4px 10px', borderRadius: 8,
-                background: user.role === 'admin' ? 'rgba(99,102,241,0.12)' : 'rgba(16,185,129,0.12)',
-                border: `1px solid ${user.role === 'admin' ? 'rgba(99,102,241,0.3)' : 'rgba(16,185,129,0.3)'}`,
+                padding: '5px 10px', borderRadius: 6,
+                background: '#0B0F15', border: '1px solid #1a2435',
               }}>
-                {user.role === 'admin' ? <Shield size={12} color="#818cf8" /> : <UserCheck size={12} color="#10b981" />}
-                <span style={{ fontSize: 11, fontWeight: 600, color: user.role === 'admin' ? '#c7d2fe' : '#a7f3d0' }}>
-                  {user.name}
-                </span>
-                <span style={{
-                  fontSize: 9, textTransform: 'uppercase', fontWeight: 700,
-                  padding: '1px 4px', borderRadius: 4,
-                  background: user.role === 'admin' ? '#6366f1' : '#10b981', color: '#fff'
-                }}>
-                  {user.role}
-                </span>
+                <UserCheck size={12} color="#7d8da0" />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#d1dae6' }}>{user.name}</span>
+                <span className="cyber-badge cyber-badge-muted" style={{ fontSize: 9, padding: '1px 5px' }}>{user.role}</span>
               </div>
-              <button
-                onClick={() => { logout(); router.push('/login'); }}
-                title="Sign Out"
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  width: 28, height: 28, borderRadius: 6,
-                  background: 'transparent', border: '1px solid #1f2335',
-                  color: '#8b91a8', cursor: 'pointer'
-                }}
-              >
-                <LogOut size={13} />
+              <button onClick={() => { logout(); router.push('/login'); }}
+                title="Sign out" className="cyber-btn cyber-btn-ghost" style={{ padding: '6px 8px' }}>
+                <LogOut size={13} color="#7d8da0" />
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => router.push('/login?returnUrl=/apply')}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px',
-                background: 'rgba(255,255,255,0.05)', border: '1px solid #262b40',
-                borderRadius: 8, color: '#e2e8f0', fontSize: 12, fontWeight: 600, cursor: 'pointer',
-              }}
-            >
-              <LogIn size={13} /> Sign In
+            <button onClick={() => router.push('/login?returnUrl=/apply')}
+              className="cyber-btn cyber-btn-secondary" style={{ padding: '6px 14px', fontSize: 12 }}>
+              <LogIn size={13} /> Sign in
             </button>
           )}
         </div>
       </div>
 
-      <div style={{ maxWidth: 600, margin: '0 auto', padding: '32px 24px' }}>
-        {/* Demo shortcuts */}
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '28px 24px' }}>
+        {/* Test Presets */}
         <div style={{
-          background: 'rgba(99,102,246,0.06)', border: '1px solid rgba(99,102,246,0.2)',
-          borderRadius: 12, padding: '14px 18px', marginBottom: 24,
+          background: '#0B0F15', border: '1px solid #151D2B',
+          borderRadius: 10, padding: '14px 18px', marginBottom: 24,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#818cf8', marginBottom: 2 }}>Demo Presets</div>
-            <div style={{ fontSize: 11, color: '#4a5068' }}>Load test data to quickly demo the workflow</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#f0f4f8', marginBottom: 2 }}>
+              Test Presets
+            </div>
+            <div style={{ fontSize: 11, color: '#7d8da0' }}>Pre-fill with sample data for testing</div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => loadDemo(true)} style={{ padding: '6px 12px', borderRadius: 7, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
-              ✓ Complete App
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={() => loadDemo(true)}
+              className="cyber-btn cyber-btn-secondary" style={{ fontSize: 11, padding: '5px 12px' }}>
+              ✓ Complete
             </button>
-            <button onClick={() => loadDemo(false)} style={{ padding: '6px 12px', borderRadius: 7, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
-              ✕ Incomplete App
+            <button onClick={() => loadDemo(false)}
+              className="cyber-btn cyber-btn-secondary" style={{ fontSize: 11, padding: '5px 12px' }}>
+              ✕ Incomplete
             </button>
           </div>
         </div>
 
-        <div style={{ background: '#0f1117', border: '1px solid #1f2335', borderRadius: 16, padding: 28 }}>
-          <div style={{ marginBottom: 24 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 800, color: '#e8eaf0', marginBottom: 6 }}>Application Form</h1>
-            <p style={{ fontSize: 13, color: '#8b91a8' }}>Submit your application to be processed by FlowForge automation</p>
+        {/* Form Card */}
+        <div style={{
+          background: '#0B0F15', border: '1px solid #151D2B',
+          borderRadius: 12, padding: 28,
+        }}>
+          <div style={{ marginBottom: 24, borderBottom: '1px solid #151D2B', paddingBottom: 16 }}>
+            <h1 style={{ fontSize: 18, fontWeight: 700, color: '#f0f4f8', marginBottom: 4 }}>
+              Submit Application
+            </h1>
+            <p style={{ fontSize: 12, color: '#7d8da0' }}>
+              Fill in your details to trigger the automated review pipeline
+            </p>
           </div>
 
           {result?.error && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              padding: '12px 14px', borderRadius: 8, marginBottom: 20,
-              background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
-              fontSize: 12, color: '#ef4444',
+              padding: '10px 14px', borderRadius: 8, marginBottom: 20,
+              background: 'rgba(255,59,92,0.06)', border: '1px solid rgba(255,59,92,0.2)',
+              fontSize: 12, color: '#ff3b5c',
             }}>
-              <AlertTriangle size={13} /> {result.error}
+              <AlertTriangle size={14} /> {result.error}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             <Field id="applicant_name" label="Full Name" icon={User} error={errors.applicant_name}>
-              <input
-                id="applicant_name"
-                value={form.applicant_name}
+              <input id="applicant_name" value={form.applicant_name}
                 onChange={(e) => setForm({ ...form, applicant_name: e.target.value })}
-                placeholder="Aarav Kumar"
-                style={inputStyle(!!errors.applicant_name)}
-              />
+                placeholder="e.g. Alex Chen" className="cyber-input"
+                style={{ width: '100%', padding: '10px 12px' }} />
             </Field>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <Field id="email" label="Email Address" icon={Mail} error={errors.email}>
-                <input
-                  id="email"
-                  type="email"
-                  value={form.email}
+                <input id="email" type="email" value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="aarav@example.com"
-                  style={inputStyle(!!errors.email)}
-                />
+                  placeholder="alex@flowforge.dev" className="cyber-input"
+                  style={{ width: '100%', padding: '10px 12px' }} />
               </Field>
-              <Field id="phone" label="Phone Number" icon={Phone}>
-                <input
-                  id="phone"
-                  value={form.phone}
+              <Field id="phone" label="Phone (optional)" icon={Phone}>
+                <input id="phone" value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="+91 98765 43210"
-                  style={inputStyle()}
-                />
+                  placeholder="+1 555-0192" className="cyber-input"
+                  style={{ width: '100%', padding: '10px 12px' }} />
               </Field>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              <Field id="program" label="Program / Role" icon={BookOpen} error={errors.program}>
-                <input
-                  id="program"
-                  value={form.program}
+              <Field id="program" label="Program" icon={BookOpen} error={errors.program}>
+                <input id="program" value={form.program}
                   onChange={(e) => setForm({ ...form, program: e.target.value })}
-                  placeholder="Computer Science"
-                  style={inputStyle(!!errors.program)}
-                />
+                  placeholder="Computer Science & AI" className="cyber-input"
+                  style={{ width: '100%', padding: '10px 12px' }} />
               </Field>
-              <Field id="percentage" label="Score / Percentage" icon={BarChart2} error={errors.percentage}>
-                <input
-                  id="percentage"
-                  value={form.percentage}
+              <Field id="percentage" label="Score (%)" icon={BarChart2} error={errors.percentage}>
+                <input id="percentage" value={form.percentage}
                   onChange={(e) => setForm({ ...form, percentage: e.target.value })}
-                  placeholder="84.2"
-                  style={inputStyle(!!errors.percentage)}
-                />
+                  placeholder="88.5" className="cyber-input"
+                  style={{ width: '100%', padding: '10px 12px' }} />
               </Field>
             </div>
 
             {/* Documents */}
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#8b91a8', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <Upload size={11} /> Documents Attached
+            <div style={{ marginBottom: 24 }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                fontSize: 12, fontWeight: 600, color: '#7d8da0', marginBottom: 10,
+              }}>
+                <Upload size={12} color="#00ff66" /> Required Documents
               </div>
               <div style={{
-                background: '#13151d', border: '1px solid #1f2335',
+                background: '#080B10', border: '1px solid #151D2B',
                 borderRadius: 8, padding: '14px 16px',
                 display: 'flex', flexDirection: 'column', gap: 10,
               }}>
                 {[
-                  { key: 'marksheet', label: 'Marksheet / Transcript' },
-                  { key: 'identity_proof', label: 'Identity Proof (Aadhaar / Passport)' },
-                  { key: 'photo', label: 'Passport Photo' },
+                  { key: 'marksheet', label: 'Academic Transcript' },
+                  { key: 'identity_proof', label: 'Government ID (Aadhaar / Passport)' },
+                  { key: 'photo', label: 'Passport Photograph' },
                 ].map(({ key, label }) => (
                   <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
                     <input
                       type="checkbox"
                       checked={form[key as keyof FormData] as boolean}
                       onChange={(e) => setForm({ ...form, [key]: e.target.checked })}
-                      style={{ accentColor: '#6366f1', width: 15, height: 15 }}
+                      style={{ accentColor: '#00ff66', width: 16, height: 16 }}
                     />
-                    <span style={{ fontSize: 13, color: form[key as keyof FormData] ? '#e8eaf0' : '#8b91a8' }}>
+                    <span style={{ fontSize: 13, color: form[key as keyof FormData] ? '#d1dae6' : '#4a5a70' }}>
                       {label}
-                      {form[key as keyof FormData] && <span style={{ color: '#10b981', marginLeft: 6, fontSize: 11 }}>✓ Attached</span>}
+                      {form[key as keyof FormData] && (
+                        <span style={{ color: '#00ff66', marginLeft: 8, fontSize: 10, fontFamily: 'var(--font-mono)' }}>✓ ATTACHED</span>
+                      )}
                     </span>
                   </label>
                 ))}
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              style={{
-                width: '100%', padding: '13px', borderRadius: 10,
-                background: 'linear-gradient(135deg, #6366f1, #818cf8)',
-                border: 'none', color: '#fff', fontSize: 14, fontWeight: 700,
-                cursor: submitting ? 'not-allowed' : 'pointer',
-                opacity: submitting ? 0.8 : 1,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                boxShadow: '0 4px 20px rgba(99,102,246,0.3)',
-              }}
-            >
-              {submitting ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <FileText size={16} />}
-              {submitting ? 'Submitting & Running Workflow...' : 'Submit Application'}
+            <button type="submit" disabled={submitting}
+              className="cyber-btn cyber-btn-primary"
+              style={{ width: '100%', padding: '13px', fontSize: 14 }}>
+              {submitting ? (
+                <><Loader2 size={16} className="spin" /> Submitting...</>
+              ) : (
+                <><FileText size={15} /> Submit Application</>
+              )}
             </button>
           </form>
         </div>

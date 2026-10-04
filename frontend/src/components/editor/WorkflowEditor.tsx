@@ -84,9 +84,9 @@ export default function WorkflowEditor({ workflowId, initialGraph, workflowName,
   const onConnect = useCallback((params: Connection) => {
     setEdges((eds) => addEdge(params, eds).map((e) => ({
       ...e,
-      markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1' },
-      style: { stroke: '#2a2f4a', strokeWidth: 2 },
-      animated: false,
+      markerEnd: { type: MarkerType.ArrowClosed, color: '#00ff66' },
+      style: { stroke: '#00ff66', strokeWidth: 1.5 },
+      animated: true,
     })));
   }, [setEdges]);
 
@@ -190,11 +190,11 @@ export default function WorkflowEditor({ workflowId, initialGraph, workflowName,
       await api.workflows.update(workflowId, { graph_json: graph });
       const result = await api.workflows.run(workflowId, {
         input_json: {
-          applicant_name: 'Aarav Kumar',
-          email: 'aarav@example.com',
-          program: 'Computer Science',
-          percentage: '84.2',
-          documents_json: { marksheet: true, identity_proof: true, photo: false },
+          applicant_name: 'Demo Candidate',
+          email: 'candidate@flowforge.dev',
+          program: 'Computer Science & AI',
+          percentage: '88.5',
+          documents_json: { marksheet: true, identity_proof: true, photo: true },
         }
       });
       setRunId(result.run_id);
@@ -221,75 +221,67 @@ export default function WorkflowEditor({ workflowId, initialGraph, workflowName,
 
   return (
     <div style={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
-      {/* Toolbar */}
+      {/* Cyber Toolbar */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '10px 16px',
-        background: '#0f1117',
-        borderBottom: '1px solid #1f2335',
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 18px',
+        background: '#07090e',
+        borderBottom: '1px solid #161f2e',
         flexShrink: 0,
       }}>
         <button
           onClick={() => router.push('/dashboard')}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 4,
-            padding: '6px 10px', borderRadius: 7,
-            background: 'transparent', border: '1px solid #1f2335',
-            color: '#8b91a8', fontSize: 12, cursor: 'pointer',
-          }}
+          className="cyber-btn cyber-btn-secondary"
+          style={{ padding: '6px 12px', fontSize: 11 }}
         >
-          <ChevronLeft size={13} /> Dashboard
+          <ChevronLeft size={13} />
+          <span>[ RETURN_DASHBOARD ]</span>
         </button>
 
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Zap size={16} color="#6366f1" />
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#e8eaf0' }}>{workflowName || 'Workflow'}</span>
-          <span style={{
-            fontSize: 11, padding: '2px 8px', borderRadius: 999,
-            background: workflowStatus === 'published' ? 'rgba(16,185,129,0.15)' : 'rgba(99,102,246,0.15)',
-            color: workflowStatus === 'published' ? '#10b981' : '#818cf8',
-            border: `1px solid ${workflowStatus === 'published' ? 'rgba(16,185,129,0.3)' : 'rgba(99,102,246,0.3)'}`,
-          }}>
-            {workflowStatus || 'draft'}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Zap size={16} color="#00ff66" />
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 800, color: '#f8fafc', letterSpacing: '0.04em' }}>
+            {workflowName || 'ORCHESTRATOR_GRAPH'}
+          </span>
+          <span className={`cyber-badge ${workflowStatus === 'published' ? 'cyber-badge-green' : 'cyber-badge-muted'}`} style={{ fontSize: 9 }}>
+            [{workflowStatus ? workflowStatus.toUpperCase() : 'DRAFT'}]
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: 6 }}>
-          <ToolbarBtn onClick={handleSave} loading={saving} icon={<Save size={13} />} label="Save" />
-          <ToolbarBtn onClick={handleValidate} icon={<CheckCircle size={13} />} label="Validate" variant="secondary" />
-          <ToolbarBtn onClick={handlePublish} loading={publishing} icon={<Upload size={13} />} label="Publish" variant="success" />
-          <ToolbarBtn onClick={handleRun} loading={running} icon={<Play size={13} />} label="Test Run" variant="primary" />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <ToolbarBtn onClick={handleSave} loading={saving} icon={<Save size={13} />} label="[ SAVE_GRAPH ]" />
+          <ToolbarBtn onClick={handleValidate} icon={<CheckCircle size={13} />} label="[ VALIDATE ]" variant="secondary" />
+          <ToolbarBtn onClick={handlePublish} loading={publishing} icon={<Upload size={13} />} label="[ PUBLISH ]" variant="success" />
+          <ToolbarBtn onClick={handleRun} loading={running} icon={<Play size={13} />} label="[ EXECUTE_TEST_RUN ]" variant="primary" />
           {runId && (
             <button
               onClick={() => router.push(`/runs/${runId}`)}
-              style={{
-                padding: '6px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
-                background: 'rgba(99,102,246,0.15)', border: '1px solid rgba(99,102,246,0.4)',
-                color: '#818cf8', cursor: 'pointer',
-              }}
+              className="cyber-btn cyber-btn-secondary"
+              style={{ padding: '6px 12px', fontSize: 11, color: '#00f0ff', borderColor: 'rgba(0,240,255,0.3)' }}
             >
-              View Run ↗
+              [ VIEW_RUN_TELEMETRY ↗ ]
             </button>
           )}
         </div>
       </div>
 
-      {/* Toast */}
+      {/* Cyber Toast */}
       {toast && (
         <div style={{
           position: 'fixed', top: 70, right: 20, zIndex: 9999,
-          padding: '10px 16px', borderRadius: 10,
-          background: toast.type === 'success' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
-          border: `1px solid ${toast.type === 'success' ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'}`,
-          color: toast.type === 'success' ? '#10b981' : '#ef4444',
-          fontSize: 13, fontWeight: 500,
+          padding: '10px 16px', borderRadius: 6,
+          background: toast.type === 'success' ? '#071510' : '#17090f',
+          border: `1px solid ${toast.type === 'success' ? 'rgba(0,255,102,0.4)' : 'rgba(255,51,102,0.4)'}`,
+          color: toast.type === 'success' ? '#00ff66' : '#ff3366',
+          fontFamily: 'var(--font-mono)',
+          fontSize: 12, fontWeight: 700,
           display: 'flex', alignItems: 'center', gap: 8,
-          backdropFilter: 'blur(8px)',
-          animation: 'fadeIn 0.3s ease',
+          backdropFilter: 'blur(10px)',
+          boxShadow: toast.type === 'success' ? '0 0 16px rgba(0,255,102,0.25)' : '0 0 16px rgba(255,51,102,0.25)',
         }}>
-          {toast.type === 'success' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+          {toast.type === 'success' ? <CheckCircle size={14} color="#00ff66" /> : <AlertTriangle size={14} color="#ff3366" />}
           {toast.msg}
-          <button onClick={() => setToast(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', marginLeft: 4 }}>
+          <button onClick={() => setToast(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', marginLeft: 6 }}>
             <X size={12} />
           </button>
         </div>
@@ -314,34 +306,36 @@ export default function WorkflowEditor({ workflowId, initialGraph, workflowName,
             nodeTypes={nodeTypes}
             fitView
             deleteKeyCode="Delete"
-            style={{ background: '#0a0b0f' }}
+            style={{ background: '#040507' }}
             defaultEdgeOptions={{
-              markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1' },
-              style: { stroke: '#2a2f4a', strokeWidth: 2 },
+              markerEnd: { type: MarkerType.ArrowClosed, color: '#00ff66' },
+              style: { stroke: '#00ff66', strokeWidth: 1.5 },
             }}
           >
-            <Background variant={BackgroundVariant.Dots} color="#1a1d27" gap={20} />
-            <Controls />
+            <Background variant={BackgroundVariant.Dots} color="#162232" gap={20} />
+            <Controls style={{ background: '#0a0d14', border: '1px solid #1a2436', fill: '#00ff66' }} />
             <MiniMap
               nodeColor={(n) => {
                 const cfg = NODE_TYPES_CONFIG[n.type || ''];
-                return cfg?.color || '#6366f1';
+                return cfg?.color || '#00ff66';
               }}
-              maskColor="rgba(10,11,15,0.8)"
+              maskColor="rgba(4,5,7,0.85)"
+              style={{ background: '#080a10', border: '1px solid #141c2a' }}
             />
 
             {nodes.length === 0 && (
               <Panel position="top-center">
                 <div style={{
                   marginTop: 120, textAlign: 'center',
-                  color: '#4a5068', pointerEvents: 'none' as const,
+                  color: '#4e5d78', pointerEvents: 'none' as const,
+                  fontFamily: 'var(--font-mono)',
                 }}>
-                  <div style={{ fontSize: 40, marginBottom: 12 }}>⚡</div>
-                  <div style={{ fontSize: 16, fontWeight: 600, color: '#8b91a8' }}>
-                    Drag nodes from the left panel to start building
+                  <div style={{ fontSize: 32, marginBottom: 12, color: '#00ff66', fontWeight: 800 }}>[ + ]</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', letterSpacing: '0.04em' }}>
+                    CANVAS_WORKSPACE_EMPTY
                   </div>
-                  <div style={{ fontSize: 13, marginTop: 6 }}>
-                    Connect nodes with edges to define your workflow logic
+                  <div style={{ fontSize: 12, marginTop: 6, color: '#6b7c96' }}>
+                    Drag node modules from the library panel to compose execution pipeline
                   </div>
                 </div>
               </Panel>
@@ -372,10 +366,10 @@ function ToolbarBtn({
   variant?: 'default' | 'primary' | 'success' | 'secondary';
 }) {
   const styles: Record<string, { bg: string; border: string; color: string }> = {
-    default: { bg: '#13151d', border: '#1f2335', color: '#8b91a8' },
-    primary: { bg: 'rgba(99,102,246,0.15)', border: 'rgba(99,102,246,0.4)', color: '#818cf8' },
-    success: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.35)', color: '#10b981' },
-    secondary: { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)', color: '#f59e0b' },
+    default: { bg: '#0b0f17', border: '#192434', color: '#8b9bb4' },
+    primary: { bg: 'rgba(0, 255, 102, 0.1)', border: 'rgba(0, 255, 102, 0.35)', color: '#00ff66' },
+    success: { bg: 'rgba(0, 240, 255, 0.1)', border: 'rgba(0, 240, 255, 0.35)', color: '#00f0ff' },
+    secondary: { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.35)', color: '#f59e0b' },
   };
   const s = styles[variant];
   return (
@@ -383,14 +377,16 @@ function ToolbarBtn({
       onClick={onClick}
       disabled={loading}
       style={{
-        display: 'flex', alignItems: 'center', gap: 5,
-        padding: '6px 12px', borderRadius: 7,
+        fontFamily: 'var(--font-mono)',
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '6px 12px', borderRadius: 4,
         background: s.bg, border: `1px solid ${s.border}`, color: s.color,
-        fontSize: 12, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer',
-        opacity: loading ? 0.7 : 1, transition: 'all 0.15s',
+        fontSize: 11, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
+        opacity: loading ? 0.7 : 1, transition: 'all 0.15s ease',
+        letterSpacing: '0.04em',
       }}
     >
-      {loading ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : icon}
+      {loading ? <Loader2 size={12} className="spin" /> : icon}
       {label}
     </button>
   );

@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Zap, Shield, User, Lock, Mail, Eye, EyeOff,
   ArrowRight, CheckCircle2, AlertCircle, Loader2, Sparkles,
-  Workflow, Check, RefreshCw
+  Terminal, Cpu, KeyRound, Radio
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/store';
 
@@ -14,25 +14,20 @@ function LoginFormContent() {
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get('returnUrl');
 
-  const { login, register, user, logout } = useAuthStore();
+  const { login, register } = useAuthStore();
 
-  // Mode: 'admin' | 'user'
   const [roleMode, setRoleMode] = useState<'admin' | 'user'>('admin');
-  // Tab: 'login' | 'register'
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
 
-  // Form fields
   const [name, setName] = useState('');
   const [email, setEmail] = useState('admin@flowforge.dev');
   const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
 
-  // States
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Sync demo credentials when switching role modes if user hasn't typed custom fields
   const handleRoleSwitch = (mode: 'admin' | 'user') => {
     setRoleMode(mode);
     setError(null);
@@ -53,7 +48,7 @@ function LoginFormContent() {
     setError(null);
     setSuccessMsg(null);
     if (tab === 'register') {
-      setName(roleMode === 'admin' ? 'New Admin' : 'New Applicant');
+      setName(roleMode === 'admin' ? 'Alex Administrator' : 'Jane Applicant');
       setEmail('');
       setPassword('');
     } else {
@@ -79,18 +74,18 @@ function LoginFormContent() {
 
     try {
       const loggedUser = await login(demoEmail, demoPassword);
-      setSuccessMsg(`Welcome, ${loggedUser.name}! Redirecting...`);
+      setSuccessMsg(`Welcome back, ${loggedUser.name}`);
       setTimeout(() => {
         if (returnUrl) {
           router.push(returnUrl);
         } else if (loggedUser.role === 'admin') {
           router.push('/dashboard');
         } else {
-          router.push('/apply');
+          router.push('/dashboard');
         }
-      }, 700);
-    } catch (err: any) {
-      setError(err?.message || 'Login failed. Please check credentials.');
+      }, 600);
+    } catch (err: unknown) {
+      setError((err as Error)?.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }
@@ -102,11 +97,11 @@ function LoginFormContent() {
     setSuccessMsg(null);
 
     if (!email.trim() || !email.includes('@')) {
-      setError('Please provide a valid email address.');
+      setError('Please enter a valid email address');
       return;
     }
     if (!password.trim() || password.length < 4) {
-      setError('Password must be at least 4 characters long.');
+      setError('Password must be at least 4 characters');
       return;
     }
 
@@ -115,37 +110,33 @@ function LoginFormContent() {
     try {
       if (authTab === 'login') {
         const loggedUser = await login(email, password);
-        setSuccessMsg(`Logged in successfully as ${loggedUser.name}!`);
+        setSuccessMsg(`Welcome back, ${loggedUser.name}`);
         setTimeout(() => {
           if (returnUrl) {
             router.push(returnUrl);
-          } else if (loggedUser.role === 'admin') {
-            router.push('/dashboard');
           } else {
-            router.push('/apply');
+            router.push('/dashboard');
           }
-        }, 700);
+        }, 600);
       } else {
         if (!name.trim()) {
-          setError('Please enter your full name.');
+          setError('Please enter your full name');
           setLoading(false);
           return;
         }
         const assignedRole = roleMode === 'admin' ? 'admin' : 'applicant';
         const registeredUser = await register(name, email, password, assignedRole);
-        setSuccessMsg(`Account created! Logged in as ${registeredUser.name}.`);
+        setSuccessMsg(`Account created for ${registeredUser.name}`);
         setTimeout(() => {
           if (returnUrl) {
             router.push(returnUrl);
-          } else if (registeredUser.role === 'admin') {
-            router.push('/dashboard');
           } else {
-            router.push('/apply');
+            router.push('/dashboard');
           }
-        }, 700);
+        }, 600);
       }
-    } catch (err: any) {
-      setError(err?.message || 'Authentication error. Please verify your details.');
+    } catch (err: unknown) {
+      setError((err as Error)?.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }
@@ -154,512 +145,261 @@ function LoginFormContent() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99,102,241,0.18), transparent 70%), #0a0b0f',
+      background: '#050608',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '32px 16px',
       position: 'relative',
-      overflow: 'hidden',
-      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      zIndex: 2,
     }}>
-      {/* Background Glow Orbs */}
-      <div style={{
-        position: 'absolute',
-        top: '15%',
-        left: '20%',
-        width: 380,
-        height: 380,
-        borderRadius: '50%',
-        background: roleMode === 'admin' ? 'radial-gradient(circle, rgba(99,102,241,0.15), transparent 70%)' : 'radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%)',
-        filter: 'blur(50px)',
-        pointerEvents: 'none',
-        transition: 'all 0.5s ease',
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '10%',
-        right: '20%',
-        width: 340,
-        height: 340,
-        borderRadius: '50%',
-        background: roleMode === 'admin' ? 'radial-gradient(circle, rgba(139,92,246,0.15), transparent 70%)' : 'radial-gradient(circle, rgba(6,182,212,0.12), transparent 70%)',
-        filter: 'blur(50px)',
-        pointerEvents: 'none',
-        transition: 'all 0.5s ease',
-      }} />
-
       {/* Brand Header */}
-      <div style={{ textAlign: 'center', marginBottom: 28, zIndex: 10 }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+      <div style={{ textAlign: 'center', marginBottom: 32, zIndex: 10 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
           <div style={{
-            width: 42,
-            height: 42,
-            borderRadius: 12,
-            background: 'linear-gradient(135deg, #6366f1, #818cf8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 24px -4px rgba(99,102,241,0.5)',
+            width: 36, height: 36, borderRadius: 8,
+            background: 'linear-gradient(135deg, rgba(0,255,102,0.12), rgba(0,212,255,0.12))',
+            border: '1px solid rgba(0,255,102,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Zap size={22} color="#ffffff" />
+            <Zap size={18} color="#00ff66" />
           </div>
-          <span style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.03em' }}>
-            Flow<span style={{ color: '#818cf8' }}>Forge</span>
-          </span>
-          <span style={{
-            fontSize: 11,
-            padding: '3px 8px',
-            borderRadius: 6,
-            background: 'rgba(99,102,246,0.15)',
-            color: '#818cf8',
-            border: '1px solid rgba(99,102,246,0.3)',
-            fontWeight: 700,
-            letterSpacing: '0.04em'
-          }}>
-            ALGOTHON&apos;26
+          <span style={{ fontSize: 28, fontWeight: 800, color: '#f0f4f8', letterSpacing: '-0.02em' }}>
+            Flow<span style={{ color: '#00ff66' }}>Forge</span>
           </span>
         </div>
-        <p style={{ color: '#8b91a8', fontSize: 14, margin: 0, fontWeight: 400 }}>
-          Visual Workflow Automation &amp; Orchestration Platform
-        </p>
+        <div style={{ color: '#4a5a70', fontSize: 13, fontWeight: 500 }}>
+          Workflow Orchestration Platform
+        </div>
       </div>
 
-      {/* Main Glass Card */}
+      {/* Auth Card */}
       <div style={{
-        width: '100%',
-        maxWidth: 480,
-        background: 'rgba(15, 17, 23, 0.85)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid #1f2335',
-        borderRadius: 20,
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        width: '100%', maxWidth: 440,
+        background: '#0B0F15',
+        border: '1px solid #151D2B',
+        borderRadius: 12,
         overflow: 'hidden',
-        zIndex: 10,
-        position: 'relative'
+        zIndex: 10, position: 'relative',
+        boxShadow: '0 24px 64px -16px rgba(0,0,0,0.6)',
       }}>
-        {/* Accent Bar based on active role */}
+        {/* Accent bar */}
         <div style={{
-          height: 3,
-          width: '100%',
-          background: roleMode === 'admin'
-            ? 'linear-gradient(90deg, #6366f1, #a855f7, #6366f1)'
-            : 'linear-gradient(90deg, #10b981, #06b6d4, #10b981)',
-          transition: 'background 0.3s ease'
+          height: 2, width: '100%',
+          background: 'linear-gradient(90deg, transparent, #00ff66, #00d4ff, transparent)',
         }} />
 
-        <div style={{ padding: '28px 30px' }}>
-          {/* Role Mode Selector Toggle */}
+        <div style={{ padding: '28px' }}>
+          {/* Role Switcher */}
           <div style={{ marginBottom: 22 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 8 }}>
-              Select Portal Type
-            </label>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#4a5a70', marginBottom: 8, letterSpacing: '0.04em' }}>
+              SELECT PORTAL
+            </div>
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              background: '#090a0f',
-              padding: 4,
-              borderRadius: 12,
-              border: '1px solid #1f2335',
-              gap: 4
+              display: 'grid', gridTemplateColumns: '1fr 1fr',
+              background: '#080B10', padding: 3, borderRadius: 8,
+              border: '1px solid #151D2B', gap: 3,
             }}>
-              <button
-                type="button"
-                onClick={() => handleRoleSwitch('admin')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  padding: '9px 12px',
-                  borderRadius: 9,
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  fontSize: 13,
-                  transition: 'all 0.2s ease',
-                  background: roleMode === 'admin' ? 'rgba(99,102,241,0.2)' : 'transparent',
-                  color: roleMode === 'admin' ? '#a5b4fc' : '#8b91a8',
-                  boxShadow: roleMode === 'admin' ? '0 0 0 1px rgba(99,102,241,0.4)' : 'none'
-                }}
-              >
-                <Shield size={15} color={roleMode === 'admin' ? '#818cf8' : 'currentColor'} />
-                <span>Admin Portal</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleRoleSwitch('user')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  padding: '9px 12px',
-                  borderRadius: 9,
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  fontSize: 13,
-                  transition: 'all 0.2s ease',
-                  background: roleMode === 'user' ? 'rgba(16,185,129,0.18)' : 'transparent',
-                  color: roleMode === 'user' ? '#6ee7b7' : '#8b91a8',
-                  boxShadow: roleMode === 'user' ? '0 0 0 1px rgba(16,185,129,0.4)' : 'none'
-                }}
-              >
-                <User size={15} color={roleMode === 'user' ? '#10b981' : 'currentColor'} />
-                <span>User / Applicant</span>
-              </button>
+              {[
+                { mode: 'admin' as const, label: 'Admin / Reviewer', icon: Shield },
+                { mode: 'user' as const, label: 'Applicant', icon: User },
+              ].map(({ mode, label, icon: Icon }) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => handleRoleSwitch(mode)}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    padding: '10px 12px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                    fontWeight: 600, fontSize: 12,
+                    transition: 'all 200ms ease',
+                    background: roleMode === mode ? 'rgba(0,255,102,0.08)' : 'transparent',
+                    color: roleMode === mode ? '#00ff66' : '#7d8da0',
+                  }}
+                >
+                  <Icon size={13} />
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Quick Demo Access Bar */}
+          {/* Quick Demo */}
           <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px dashed #262b40',
-            borderRadius: 12,
-            padding: '12px 14px',
-            marginBottom: 24,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10
+            background: '#080B10', border: '1px dashed #1a2435',
+            borderRadius: 8, padding: '10px 14px', marginBottom: 22,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: '#9ca3af' }}>
-              <Sparkles size={14} color="#f59e0b" />
-              <span>Instant Test Access:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#7d8da0' }}>
+              <KeyRound size={12} color="#00ff66" />
+              <span>Quick demo</span>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('admin')}
-                style={{
-                  padding: '5px 10px',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  borderRadius: 6,
-                  background: 'rgba(99,102,241,0.15)',
-                  border: '1px solid rgba(99,102,241,0.3)',
-                  color: '#818cf8',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s'
-                }}
-              >
-                Demo Admin
+              <button type="button" onClick={() => handleQuickDemo('admin')}
+                className="cyber-btn cyber-btn-secondary" style={{ padding: '4px 12px', fontSize: 11 }}>
+                Admin
               </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('user')}
-                style={{
-                  padding: '5px 10px',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  borderRadius: 6,
-                  background: 'rgba(16,185,129,0.15)',
-                  border: '1px solid rgba(16,185,129,0.3)',
-                  color: '#34d399',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s'
-                }}
-              >
-                Demo User
+              <button type="button" onClick={() => handleQuickDemo('user')}
+                className="cyber-btn cyber-btn-secondary" style={{ padding: '4px 12px', fontSize: 11 }}>
+                User
               </button>
             </div>
           </div>
 
-          {/* Sign In vs Register Tabs */}
-          <div style={{
-            display: 'flex',
-            borderBottom: '1px solid #1f2335',
-            marginBottom: 20,
-            gap: 18
-          }}>
-            <button
-              type="button"
-              onClick={() => handleTabSwitch('login')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                borderBottom: authTab === 'login' ? `2px solid ${roleMode === 'admin' ? '#6366f1' : '#10b981'}` : '2px solid transparent',
-                paddingBottom: 10,
-                color: authTab === 'login' ? '#f3f4f6' : '#6b7280',
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTabSwitch('register')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                borderBottom: authTab === 'register' ? `2px solid ${roleMode === 'admin' ? '#6366f1' : '#10b981'}` : '2px solid transparent',
-                paddingBottom: 10,
-                color: authTab === 'register' ? '#f3f4f6' : '#6b7280',
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Create Account
-            </button>
+          {/* Login / Register Tabs */}
+          <div style={{ display: 'flex', borderBottom: '1px solid #151D2B', marginBottom: 22 }}>
+            {[
+              { tab: 'login' as const, label: 'Sign In' },
+              { tab: 'register' as const, label: 'Create Account' },
+            ].map(({ tab, label }) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => handleTabSwitch(tab)}
+                style={{
+                  flex: 1, padding: '10px 0',
+                  background: 'none', border: 'none',
+                  borderBottom: authTab === tab ? '2px solid #00ff66' : '2px solid transparent',
+                  color: authTab === tab ? '#f0f4f8' : '#7d8da0',
+                  fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                  transition: 'all 200ms',
+                }}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
-          {/* Feedback alerts */}
+          {/* Status Messages */}
           {error && (
             <div style={{
-              background: 'rgba(239,68,68,0.1)',
-              border: '1px solid rgba(239,68,68,0.3)',
-              borderRadius: 10,
-              padding: '10px 14px',
-              color: '#f87171',
-              fontSize: 13,
-              marginBottom: 16,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8
+              background: 'rgba(255,59,92,0.08)', border: '1px solid rgba(255,59,92,0.2)',
+              borderRadius: 8, padding: '10px 14px', marginBottom: 18,
+              fontSize: 12, color: '#ff3b5c', display: 'flex', alignItems: 'center', gap: 8,
             }}>
-              <AlertCircle size={16} style={{ flexShrink: 0 }} />
-              <span>{error}</span>
+              <AlertCircle size={14} /> {error}
             </div>
           )}
 
           {successMsg && (
             <div style={{
-              background: 'rgba(16,185,129,0.1)',
-              border: '1px solid rgba(16,185,129,0.3)',
-              borderRadius: 10,
-              padding: '10px 14px',
-              color: '#34d399',
-              fontSize: 13,
-              marginBottom: 16,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8
+              background: 'rgba(0,255,102,0.06)', border: '1px solid rgba(0,255,102,0.2)',
+              borderRadius: 8, padding: '10px 14px', marginBottom: 18,
+              fontSize: 12, color: '#00ff66', display: 'flex', alignItems: 'center', gap: 8,
             }}>
-              <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
-              <span>{successMsg}</span>
+              <CheckCircle2 size={14} /> {successMsg}
             </div>
           )}
 
-          {/* Auth Form */}
+          {/* Form */}
           <form onSubmit={handleSubmit}>
             {authTab === 'register' && (
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#9ca3af', marginBottom: 6 }}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#7d8da0', display: 'block', marginBottom: 6 }}>
                   Full Name
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <User size={15} color="#6b7280" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
                   <input
-                    type="text"
-                    required
-                    placeholder={roleMode === 'admin' ? 'e.g. Alex Administrator' : 'e.g. Jane Doe'}
-                    value={name}
+                    type="text" value={name}
                     onChange={(e) => setName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      background: '#090a0f',
-                      border: '1px solid #1f2335',
-                      borderRadius: 10,
-                      padding: '10px 14px 10px 38px',
-                      color: '#f3f4f6',
-                      fontSize: 13,
-                      outline: 'none',
-                    }}
+                    placeholder={roleMode === 'admin' ? 'e.g. Alex Administrator' : 'e.g. Jane Doe'}
+                    className="cyber-input"
+                    style={{ width: '100%', padding: '10px 12px 10px 36px' }}
                   />
+                  <User size={14} color="#4a5a70" style={{ position: 'absolute', left: 12, top: 11 }} />
                 </div>
               </div>
             )}
 
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#9ca3af', marginBottom: 6 }}>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#7d8da0', display: 'block', marginBottom: 6 }}>
                 Email Address
               </label>
               <div style={{ position: 'relative' }}>
-                <Mail size={15} color="#6b7280" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
                 <input
-                  type="email"
-                  required
-                  placeholder={roleMode === 'admin' ? 'admin@flowforge.dev' : 'user@flowforge.dev'}
-                  value={email}
+                  type="email" value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  style={{
-                    width: '100%',
-                    boxSizing: 'border-box',
-                    background: '#090a0f',
-                    border: '1px solid #1f2335',
-                    borderRadius: 10,
-                    padding: '10px 14px 10px 38px',
-                    color: '#f3f4f6',
-                    fontSize: 13,
-                    outline: 'none',
-                  }}
+                  placeholder="you@flowforge.dev"
+                  className="cyber-input"
+                  style={{ width: '100%', padding: '10px 12px 10px 36px' }}
                 />
+                <Mail size={14} color="#4a5a70" style={{ position: 'absolute', left: 12, top: 11 }} />
               </div>
             </div>
 
-            <div style={{ marginBottom: 18 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#9ca3af', marginBottom: 6 }}>
+            <div style={{ marginBottom: 22 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#7d8da0', display: 'block', marginBottom: 6 }}>
                 Password
               </label>
               <div style={{ position: 'relative' }}>
-                <Lock size={15} color="#6b7280" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="••••••••"
-                  value={password}
+                  type={showPassword ? 'text' : 'password'} value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={{
-                    width: '100%',
-                    boxSizing: 'border-box',
-                    background: '#090a0f',
-                    border: '1px solid #1f2335',
-                    borderRadius: 10,
-                    padding: '10px 38px 10px 38px',
-                    color: '#f3f4f6',
-                    fontSize: 13,
-                    outline: 'none',
-                  }}
+                  placeholder="••••••••"
+                  className="cyber-input"
+                  style={{ width: '100%', padding: '10px 38px 10px 36px' }}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute',
-                    right: 12,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: '#6b7280',
-                    cursor: 'pointer',
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                <Lock size={14} color="#4a5a70" style={{ position: 'absolute', left: 12, top: 11 }} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: 'absolute', right: 10, top: 10, background: 'none', border: 'none', color: '#4a5a70', cursor: 'pointer', padding: 2 }}>
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
             </div>
 
-            {/* Role Capabilities summary pill */}
+            {/* Role Scope Info */}
             <div style={{
-              background: roleMode === 'admin' ? 'rgba(99,102,241,0.06)' : 'rgba(16,185,129,0.06)',
-              border: `1px solid ${roleMode === 'admin' ? 'rgba(99,102,241,0.18)' : 'rgba(16,185,129,0.18)'}`,
-              borderRadius: 10,
-              padding: '10px 12px',
-              marginBottom: 20,
-              fontSize: 12,
-              color: '#94a3b8',
-              lineHeight: 1.4
+              background: '#080B10', border: '1px solid #151D2B',
+              borderRadius: 8, padding: '12px 14px', marginBottom: 22,
+              fontSize: 12, color: '#7d8da0', lineHeight: 1.6,
             }}>
-              <div style={{ fontWeight: 600, color: roleMode === 'admin' ? '#a5b4fc' : '#6ee7b7', marginBottom: 2 }}>
-                {roleMode === 'admin' ? '🛡️ Administrator Privileges' : '👤 User / Applicant Scope'}
+              <div style={{ fontWeight: 600, color: '#00ff66', marginBottom: 4, fontSize: 11 }}>
+                {roleMode === 'admin' ? 'Administrator Access' : 'Applicant Access'}
               </div>
-              {roleMode === 'admin'
-                ? 'Full access to Visual Canvas, DAG execution engine, workflow triggers, and approval queues.'
-                : 'Access to application form submission, real-time status tracker, and notifications.'}
+              <div style={{ fontSize: 11, color: '#4a5a70' }}>
+                {roleMode === 'admin'
+                  ? 'Full access to workflow editor, execution engine, visual canvas, and approval queues.'
+                  : 'Access to application submission, real-time status tracker, and notifications.'}
+              </div>
             </div>
 
             <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: 10,
-                border: 'none',
-                background: roleMode === 'admin'
-                  ? 'linear-gradient(135deg, #6366f1, #818cf8)'
-                  : 'linear-gradient(135deg, #10b981, #059669)',
-                color: '#ffffff',
-                fontWeight: 700,
-                fontSize: 14,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                boxShadow: roleMode === 'admin'
-                  ? '0 4px 16px rgba(99,102,241,0.4)'
-                  : '0 4px 16px rgba(16,185,129,0.4)',
-                opacity: loading ? 0.8 : 1,
-                transition: 'all 0.2s ease',
-              }}
+              type="submit" disabled={loading}
+              className="cyber-btn cyber-btn-primary"
+              style={{ width: '100%', padding: '12px 16px', fontSize: 14 }}
             >
               {loading ? (
-                <>
-                  <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                  <span>Processing...</span>
-                </>
+                <><Loader2 size={16} className="spin" /> Authenticating...</>
               ) : (
-                <>
-                  <span>{authTab === 'login' ? `Sign In as ${roleMode === 'admin' ? 'Admin' : 'User'}` : `Create ${roleMode === 'admin' ? 'Admin' : 'User'} Account`}</span>
-                  <ArrowRight size={16} />
-                </>
+                <>{authTab === 'login' ? 'Sign In' : 'Create Account'} <ArrowRight size={15} /></>
               )}
             </button>
           </form>
 
-          {/* Guest / Navigation Footer */}
+          {/* Footer Links */}
           <div style={{
-            marginTop: 22,
-            paddingTop: 16,
-            borderTop: '1px solid #1f2335',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            marginTop: 22, paddingTop: 16, borderTop: '1px solid #151D2B',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             fontSize: 12,
-            color: '#6b7280'
           }}>
-            <button
-              type="button"
-              onClick={() => router.push('/dashboard')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#818cf8',
-                cursor: 'pointer',
-                padding: 0,
-                fontSize: 12,
-                textDecoration: 'underline'
-              }}
-            >
-              ← Return to Dashboard
+            <button type="button" onClick={() => router.push('/dashboard')}
+              style={{ background: 'none', border: 'none', color: '#7d8da0', cursor: 'pointer', padding: 0, fontWeight: 500 }}>
+              ← Back to Dashboard
             </button>
-            <button
-              type="button"
-              onClick={() => router.push('/apply')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#10b981',
-                cursor: 'pointer',
-                padding: 0,
-                fontSize: 12,
-                textDecoration: 'underline'
-              }}
-            >
-              Public Apply Portal →
+            <button type="button" onClick={() => router.push('/apply')}
+              style={{ background: 'none', border: 'none', color: '#00d4ff', cursor: 'pointer', padding: 0, fontWeight: 500 }}>
+              Apply Now →
             </button>
           </div>
         </div>
       </div>
 
-      {/* Footer copyright / info */}
-      <div style={{ marginTop: 24, fontSize: 12, color: '#4b5563', textAlign: 'center', zIndex: 10 }}>
-        FlowForge Orchestration Engine • Secure JWT Authentication
+      <div style={{
+        marginTop: 24, fontFamily: 'var(--font-mono)',
+        fontSize: 10, color: '#2e3d52', textAlign: 'center', zIndex: 10,
+      }}>
+        FlowForge Orchestration Engine · Secured with JWT
       </div>
     </div>
   );
@@ -669,14 +409,10 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div style={{
-        minHeight: '100vh',
-        background: '#0a0b0f',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#6366f1'
+        minHeight: '100vh', background: '#050608',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00ff66',
       }}>
-        <Loader2 size={32} style={{ animation: 'spin 1s linear infinite' }} />
+        <Loader2 size={32} className="spin" />
       </div>
     }>
       <LoginFormContent />

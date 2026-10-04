@@ -1,4 +1,5 @@
 """FlowForge FastAPI main application."""
+import uuid
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -54,7 +55,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="FlowForge API",
-    description="Visual Workflow Automation Platform — ALGOTHON'26",
+    description="Visual Workflow Automation Platform",
     version="1.0.0",
     lifespan=lifespan,
 )

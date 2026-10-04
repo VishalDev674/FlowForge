@@ -6,9 +6,8 @@ echo  █████╗  ██║     ██║   ██║██║ █╗ �
 echo  ██╔══╝  ██║     ██║   ██║██║███╗██║██╔══╝  ██║   ██║██╔══██╗██║   ██║██╔══╝
 echo  ██║     ███████╗╚██████╔╝╚███╔███╔╝██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗
 echo  ╚═╝     ╚══════╝ ╚═════╝  ╚══╝╚══╝ ╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-echo.
-echo  Visual Workflow Automation Platform - ALGOTHON'26
-echo  ====================================================
+echo  Visual Workflow Automation & Orchestration Platform
+echo  ======================================================
 echo.
 
 echo [1/2] Starting FastAPI Backend on port 8000...

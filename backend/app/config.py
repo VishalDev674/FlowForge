@@ -5,7 +5,7 @@ from pydantic import field_validator
 
 class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./flowforge.db"
-    SECRET_KEY: str = "flowforge-super-secret-key-for-hackathon-2026"
+    SECRET_KEY: str = "flowforge-secure-orchestration-jwt-secret-key-2026"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     CORS_ORIGINS: Union[List[str], str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
