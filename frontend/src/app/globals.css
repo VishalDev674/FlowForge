@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+
+:root {
+  --bg-primary: #0a0b0f;
+  --bg-secondary: #0f1117;
+  --bg-card: #13151d;
+  --bg-elevated: #1a1d27;
+  --bg-hover: #1e2132;
+  --border: #1f2335;
+  --border-bright: #2a2f4a;
+  --text-primary: #e8eaf0;
+  --text-secondary: #8b91a8;
+  --text-muted: #4a5068;
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* React Flow overrides */
+.react-flow__background { background: var(--bg-secondary); }
+.react-flow__minimap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; }
+.react-flow__controls { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; }
+.react-flow__controls button { background: var(--bg-elevated); border-bottom-color: var(--border); color: var(--text-secondary); }
+.react-flow__controls button:hover { background: var(--bg-hover); color: var(--text-primary); }
+.react-flow__edge-path { stroke: var(--border-bright); }
+.react-flow__edge.selected .react-flow__edge-path { stroke: var(--accent); }
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease-out; }
+.animate-slide-in { animation: slideIn 0.3s ease-out; }
+.animate-spin { animation: spin 1s linear infinite; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* Glass morphism */
+.glass {
+  background: rgba(19, 21, 29, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Status colors */
+.status-running { color: var(--info); }
+.status-succeeded { color: var(--success); }
+.status-failed { color: var(--error); }
+.status-pending { color: var(--text-muted); }
+.status-skipped { color: var(--warning); }
+.status-retrying { color: #a855f7; }
+.status-waiting { color: var(--warning); }
